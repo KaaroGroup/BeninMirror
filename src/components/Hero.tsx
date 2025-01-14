@@ -6,7 +6,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           className="w-full h-[600px] object-cover"
-          src="https://journals.openedition.org/com/docannexe/image/10733/img-9-small580.png"
+src="https://journals.openedition.org/com/docannexe/image/10733/img-9-small580.png"
           alt="Paysage du Bénin"
         />
         <div className="absolute inset-0 bg-black opacity-50"></div>

@@ -1,26 +1,31 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Compass, Hotel, Utensils, Car } from 'lucide-react';
 
 const services = [
   {
     icon: Compass,
     title: 'Sites Touristiques',
-    description: 'Découvrez les sites historiques et culturels emblématiques du Bénin'
+    description: 'Découvrez les sites historiques et culturels emblématiques du Bénin',
+    link: '/service/sites-touristiques'
   },
   {
     icon: Hotel,
     title: 'Hébergements',
-    description: 'Trouvez le meilleur hébergement pour votre séjour'
+    description: 'Trouvez le meilleur hébergement pour votre séjour',
+    link: '/service/hebergements'
   },
   {
     icon: Utensils,
     title: 'Restaurants',
-    description: 'Savourez la délicieuse cuisine béninoise'
+    description: 'Savourez la délicieuse cuisine béninoise',
+    link: '/service/restaurants'
   },
   {
     icon: Car,
     title: 'Transport',
-    description: 'Réservez un chauffeur pour vos visites guidées'
+    description: 'Réservez un chauffeur pour vos visites guidées',
+    link: '/service/transport'
   }
 ];
 
@@ -50,9 +55,12 @@ const Services = () => {
                 <p className="mt-2 text-base text-gray-500">{service.description}</p>
               </div>
               <div className="px-6 pb-6">
-                <button className="mt-4 w-full bg-emerald-50 text-emerald-700 px-4 py-2 rounded-md hover:bg-emerald-100 transition-colors">
+                <Link 
+                  to={service.link}
+                  className="block w-full text-center bg-emerald-50 text-emerald-700 px-4 py-2 rounded-md hover:bg-emerald-100 transition-colors"
+                >
                   En savoir plus
-                </button>
+                </Link>
               </div>
             </div>
           ))}
