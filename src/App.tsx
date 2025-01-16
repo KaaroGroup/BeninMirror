@@ -11,6 +11,8 @@ import Guides from './pages/Guides';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import ServiceDetails from './pages/ServiceDetails';
+import PartnerRegistration from './pages/PartnerRegistration';
+import PartnerDashboard from './pages/PartnerDashboard';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -39,6 +41,15 @@ function AppRoutes() {
           <Route path="/guides" element={<Guides />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/service/:service" element={<ServiceDetails />} />
+          <Route path="/partner/register" element={<PartnerRegistration />} />
+          <Route
+            path="/partner/dashboard"
+            element={
+              <PrivateRoute>
+                <PartnerDashboard />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/profile"
             element={

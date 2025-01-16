@@ -41,7 +41,7 @@ const ContactForm = () => {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-medium text-gray-900">Téléphone</h3>
-                  <p className="mt-1 text-gray-600">+229 0166672622</p>
+                  <p className="mt-1 text-gray-600">+229016732576 /  +2290166672622</p>
                 </div>
               </div>
 
@@ -51,7 +51,7 @@ const ContactForm = () => {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-medium text-gray-900">Email</h3>
-                  <p className="mt-1 text-gray-600">kaarogroupsarl@gamil.com</p>
+                  <p className="mt-1 text-gray-600">kaarogroupsarl@gmail.com</p>
                 </div>
               </div>
 
