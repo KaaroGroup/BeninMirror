@@ -202,6 +202,19 @@ const validateForm = () => {
   return true
 }
 
+const checkExistingPartner = async () => {
+  if (!user.value) return false
+
+  const { data, error: checkError } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('user_id', user.value.id)
+    .maybeSingle()
+
+  if (checkError) throw checkError
+  return !!data
+}
+
 const handleSubmit = async () => {
   if (!user.value) return
 
@@ -212,20 +225,15 @@ const handleSubmit = async () => {
 
   try {
     // Vérifier si l'utilisateur est déjà partenaire
-    const { data: existingPartner } = await supabase
-      .from('partners')
-      .select('id')
-      .eq('user_id', user.value.id)
-      .single()
+    const isExistingPartner = await checkExistingPartner()
 
-    if (existingPartner) {
+    if (isExistingPartner) {
       error.value = 'Vous êtes déjà inscrit en tant que partenaire'
-      loading.value = false
       return
     }
 
     // Créer le nouveau partenaire
-    const { error: insertError } = await supabase
+    const { data: newPartner, error: insertError } = await supabase
       .from('partners')
       .insert([{
         user_id: user.value.id,
@@ -236,37 +244,26 @@ const handleSubmit = async () => {
         address: formData.address,
         registration_number: formData.registrationNumber || null
       }])
+      .select()
+      .single()
 
-    if (insertError) {
-      console.error('Error details:', insertError)
-      if (insertError.code === '23505') {
-        error.value = 'Cette entreprise est déjà enregistrée'
-      } else {
-        error.value = `Erreur lors de l'inscription: ${insertError.message}`
-      }
-    } else {
-      // Créer les statistiques initiales du partenaire
-      const { data: newPartner } = await supabase
-        .from('partners')
-        .select('id')
-        .eq('user_id', user.value.id)
-        .single()
+    if (insertError) throw insertError
 
-      if (newPartner) {
-        await supabase
-          .from('partner_stats')
-          .insert([{
-            partner_id: newPartner.id,
-            total_bookings: 0,
-            total_revenue: 0
-          }])
-      }
-
-      router.push('/partner/dashboard')
+    // Créer les statistiques initiales du partenaire
+    if (newPartner) {
+      await supabase
+        .from('partner_stats')
+        .insert([{
+          partner_id: newPartner.id,
+          total_bookings: 0,
+          total_revenue: 0
+        }])
     }
+
+    router.push('/partner/dashboard')
   } catch (err) {
-    console.error('Unexpected error:', err)
-    error.value = 'Une erreur inattendue est survenue. Veuillez réessayer.'
+    console.error('Error during partner registration:', err)
+    error.value = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
   } finally {
     loading.value = false
   }

@@ -3,6 +3,10 @@
     <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
       <h2 class="text-2xl font-bold mb-6">Ajouter un nouveau service</h2>
 
+      <div v-if="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-red-600">{{ error }}</p>
+      </div>
+
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700">
@@ -167,6 +171,7 @@ const props = defineProps<{
 
 const supabase = useSupabaseClient()
 const loading = ref(false)
+const error = ref('')
 
 const formData = reactive({
   name: '',
@@ -201,74 +206,71 @@ const toggleLanguage = (lang: string) => {
   }
 }
 
+const getTableName = (partnerType: string) => {
+  switch (partnerType) {
+    case 'cultural_site':
+      return 'tourist_sites'
+    case 'accommodation':
+      return 'hotels'
+    case 'restaurant':
+      return 'restaurants'
+    case 'transport':
+      return 'guides'
+    default:
+      return null
+  }
+}
+
 const handleSubmit = async () => {
   loading.value = true
+  error.value = ''
 
-  let tableName = ''
-  let data = {}
+  try {
+    const tableName = getTableName(props.partnerType)
+    if (!tableName) {
+      throw new Error('Type de partenaire invalide')
+    }
 
-  switch (props.partnerType) {
-    case 'cultural_site':
-      tableName = 'tourist_sites'
-      data = {
-        name: formData.name,
-        description: formData.description,
-        location: formData.location,
-        price: parseFloat(formData.price),
-        image_url: formData.imageUrl,
-        partner_id: props.partnerId
-      }
-      break
+    let data = {
+      name: formData.name,
+      description: formData.description,
+      image_url: formData.imageUrl,
+      partner_id: props.partnerId
+    }
 
-    case 'accommodation':
-      tableName = 'hotels'
-      data = {
-        name: formData.name,
-        description: formData.description,
-        location: formData.location,
-        price_per_night: parseFloat(formData.price),
-        image_url: formData.imageUrl,
-        partner_id: props.partnerId
-      }
-      break
-
-    case 'restaurant':
-      tableName = 'restaurants'
-      data = {
-        name: formData.name,
-        description: formData.description,
+    // Ajouter les champs spécifiques selon le type
+    if (props.partnerType === 'restaurant') {
+      Object.assign(data, {
         location: formData.location,
         cuisine_type: formData.cuisineType,
-        price_range: formData.priceRange,
-        image_url: formData.imageUrl,
-        partner_id: props.partnerId
-      }
-      break
-
-    case 'transport':
-      tableName = 'guides'
-      data = {
-        name: formData.name,
-        description: formData.description,
+        price_range: formData.priceRange
+      })
+    } else if (props.partnerType === 'transport') {
+      Object.assign(data, {
         languages: formData.languages,
-        price_per_day: parseFloat(formData.price),
-        image_url: formData.imageUrl,
-        partner_id: props.partnerId
-      }
-      break
-  }
+        price_per_day: parseFloat(formData.price)
+      })
+    } else {
+      Object.assign(data, {
+        location: formData.location,
+        price: props.partnerType === 'accommodation' 
+          ? { price_per_night: parseFloat(formData.price) }
+          : { price: parseFloat(formData.price) }
+      })
+    }
 
-  const { error } = await supabase
-    .from(tableName)
-    .insert([data])
+    const { error: insertError } = await supabase
+      .from(tableName)
+      .insert([data])
 
-  if (error) {
-    console.error('Error adding service:', error)
-    alert('Une erreur est survenue lors de l\'ajout du service')
-  } else {
+    if (insertError) throw insertError
+
     props.onSuccess()
+  } catch (err) {
+    console.error('Error adding service:', err)
+    error.value = 'Une erreur est survenue lors de l\'ajout du service. Veuillez réessayer.'
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
 </script>

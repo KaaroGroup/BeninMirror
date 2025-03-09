@@ -18,23 +18,31 @@
       </p>
       <div class="mt-10">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Destination</label>
-              <select v-model="destination" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
-                <option value="">Choisir une destination</option>
-                <option value="ouidah">Ouidah</option>
-                <option value="ganvie">Ganvié</option>
-                <option value="abomey">Abomey</option>
-              </select>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700">Rechercher</label>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  v-model="searchTerm"
+                  type="text"
+                  placeholder="Sites touristiques, hôtels, restaurants..."
+                  class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                />
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Date</label>
-              <input
-                v-model="date"
-                type="date"
+              <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+              <select 
+                v-model="category"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-              />
+              >
+                <option value="">Toutes</option>
+                <option value="sites">Sites Touristiques</option>
+                <option value="hotels">Hôtels</option>
+                <option value="restaurants">Restaurants</option>
+                <option value="guides">Guides</option>
+              </select>
             </div>
             <div class="flex items-end">
               <button 
@@ -52,11 +60,34 @@
 </template>
 
 <script setup lang="ts">
-const destination = ref('')
-const date = ref('')
+import { ref } from 'vue'
+import { Search } from 'lucide-vue-next'
+import { useRouter } from '#imports'
+
+const router = useRouter()
+const searchTerm = ref('')
+const category = ref('')
+
+const getCategoryPath = (cat: string) => {
+  switch (cat) {
+    case 'sites':
+      return '/sites-touristiques'
+    case 'hotels':
+      return '/hotels'
+    case 'restaurants':
+      return '/restaurants'
+    case 'guides':
+      return '/guides'
+    default:
+      return '/sites-touristiques'
+  }
+}
 
 const search = () => {
-  // Implémentation de la recherche
-  console.log('Recherche:', { destination: destination.value, date: date.value })
+  const path = getCategoryPath(category.value)
+  router.push({
+    path,
+    query: searchTerm.value ? { search: searchTerm.value } : undefined
+  })
 }
 </script>

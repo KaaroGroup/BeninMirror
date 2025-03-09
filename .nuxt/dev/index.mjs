@@ -1,32 +1,32 @@
-import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { getRequestHeader, splitCookiesString, setResponseStatus, setResponseHeader, send, getRequestHeaders, defineEventHandler, handleCacheHeaders, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, setResponseHeaders, createError, getRouterParam, readBody, getQuery as getQuery$1, getResponseStatusText } from 'file:///home/project/node_modules/h3/dist/index.mjs';
+import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { mkdirSync } from 'node:fs';
 import { Server } from 'node:http';
-import { mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parentPort, threadId } from 'node:worker_threads';
-import { getRequestDependencies, getPreloadLinks, getPrefetchLinks, createRenderer } from 'file:///home/project/node_modules/vue-bundle-renderer/dist/runtime.mjs';
-import { stringify, uneval } from 'file:///home/project/node_modules/devalue/index.js';
-import destr from 'file:///home/project/node_modules/destr/dist/index.mjs';
-import { withQuery, joinURL, withTrailingSlash, parseURL, withoutBase, getQuery, joinRelativeURL } from 'file:///home/project/node_modules/ufo/dist/index.mjs';
-import { renderToString } from 'file:///home/project/node_modules/vue/server-renderer/index.mjs';
-import { propsToString, renderSSRHead } from 'file:///home/project/node_modules/@unhead/ssr/dist/index.mjs';
-import { createHooks } from 'file:///home/project/node_modules/hookable/dist/index.mjs';
-import { createFetch as createFetch$1, Headers as Headers$1 } from 'file:///home/project/node_modules/ofetch/dist/node.mjs';
-import { createCall, createFetch } from 'file:///home/project/node_modules/unenv/runtime/fetch/index.mjs';
-import { klona } from 'file:///home/project/node_modules/klona/dist/index.mjs';
-import defu, { defuFn } from 'file:///home/project/node_modules/defu/dist/defu.mjs';
-import { snakeCase } from 'file:///home/project/node_modules/scule/dist/index.mjs';
-import { createStorage, prefixStorage } from 'file:///home/project/node_modules/unstorage/dist/index.mjs';
-import unstorage_47drivers_47fs from 'file:///home/project/node_modules/unstorage/drivers/fs.mjs';
-import { toRouteMatcher, createRouter } from 'file:///home/project/node_modules/radix3/dist/index.mjs';
-import { getContext } from 'file:///home/project/node_modules/unctx/dist/index.mjs';
+import { getRequestHeader, splitCookiesString, setResponseStatus, setResponseHeader, send, getRequestHeaders, defineEventHandler, handleCacheHeaders, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, setResponseHeaders, createError, getRouterParam, readBody, getQuery as getQuery$1, getResponseStatusText } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/h3/dist/index.mjs';
+import { getRequestDependencies, getPreloadLinks, getPrefetchLinks, createRenderer } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/vue-bundle-renderer/dist/runtime.mjs';
+import { stringify, uneval } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/devalue/index.js';
+import destr from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/destr/dist/index.mjs';
+import { withQuery, joinURL, withTrailingSlash, parseURL, withoutBase, getQuery, joinRelativeURL } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/ufo/dist/index.mjs';
+import { renderToString } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/vue/server-renderer/index.mjs';
+import { propsToString, renderSSRHead } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/@unhead/ssr/dist/index.mjs';
+import { createServerHead as createServerHead$1, CapoPlugin } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/unhead/dist/index.mjs';
+import { klona } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/klona/dist/index.mjs';
+import defu, { defuFn } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/defu/dist/defu.mjs';
+import { snakeCase } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/scule/dist/index.mjs';
+import { createHooks } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/hookable/dist/index.mjs';
+import { createFetch as createFetch$1, Headers as Headers$1 } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/ofetch/dist/node.mjs';
+import { createCall, createFetch } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/unenv/runtime/fetch/index.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { consola } from 'file:///home/project/node_modules/consola/dist/index.mjs';
-import { captureRawStackTrace, parseRawStackTrace } from 'file:///home/project/node_modules/errx/dist/index.js';
-import { isVNode, unref, version } from 'file:///home/project/node_modules/vue/index.mjs';
-import { hash } from 'file:///home/project/node_modules/ohash/dist/index.mjs';
-import { createServerHead as createServerHead$1, CapoPlugin } from 'file:///home/project/node_modules/unhead/dist/index.mjs';
-import { defineHeadPlugin } from 'file:///home/project/node_modules/@unhead/shared/dist/index.mjs';
+import { consola } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/consola/dist/index.mjs';
+import { getContext } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/unctx/dist/index.mjs';
+import { captureRawStackTrace, parseRawStackTrace } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/errx/dist/index.js';
+import { isVNode, unref, version } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/vue/index.mjs';
+import { hash } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/ohash/dist/index.mjs';
+import { createStorage, prefixStorage } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/unstorage/dist/index.mjs';
+import unstorage_47drivers_47fs from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/unstorage/drivers/fs.mjs';
+import { toRouteMatcher, createRouter } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/radix3/dist/index.mjs';
+import { defineHeadPlugin } from 'file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/node_modules/@unhead/shared/dist/index.mjs';
 
 function hasReqHeader(event, name, includes) {
   const value = getRequestHeader(event, name);
@@ -172,15 +172,15 @@ if (!window.__NUXT_DEVTOOLS_TIME_METRIC__) {
 window.__NUXT_DEVTOOLS_TIME_METRIC__.appInit = Date.now()
 `;
 
-const _x1LDWXaDKg = (function(nitro) {
+const _9LxPwZF31Q = (function(nitro) {
   nitro.hooks.hook("render:html", (htmlContext) => {
     htmlContext.head.push(`<script>${script}<\/script>`);
   });
 });
 
-const rootDir = "/home/project";
+const rootDir = "D:/STAFAST/CODES/KGS/BENIN MIRROR";
 
-const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"}],"link":[],"style":[],"script":[],"noscript":[],"title":"Benin Mirror - Le vitrine du Bénin"};
+const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"property":"og:title","content":"Benin Mirror - La vitrine du Bénin"},{"property":"og:description","content":"Explorez les merveilles culturelles, historiques et naturelles du Bénin. Réservez vos visites guidées, hôtels et restaurants en quelques clics."},{"property":"og:image","content":"/img/ogmeta.png"},{"property":"og:url","content":"https://beninmirror.netlify.app/"},{"property":"og:type","content":"website"},{"name":"twitter:card","content":"summary_large_image"},{"name":"twitter:title","content":"Benin Mirror - La vitrine du Bénin"},{"name":"twitter:description","content":"Explorez les merveilles culturelles, historiques et naturelles du Bénin. Réservez vos visites guidées, hôtels et restaurants en quelques clics."},{"name":"twitter:image","content":"/img/ogmeta.png"}],"link":[],"style":[],"script":[],"noscript":[],"title":"Benin Mirror - La vitrine du Bénin"};
 
 const appRootTag = "div";
 
@@ -197,7 +197,7 @@ const devReducers = {
   URL: (data) => data instanceof URL ? data.toString() : undefined
 };
 const asyncContext = getContext("nuxt-dev", { asyncContext: true, AsyncLocalStorage });
-const _5gU0qFpjn9 = (nitroApp) => {
+const _RbTOEXUJrX = (nitroApp) => {
   const handler = nitroApp.h3App.handler;
   nitroApp.h3App.handler = (event) => {
     return asyncContext.callAsync({ logs: [], event }, () => handler(event));
@@ -267,18 +267,18 @@ function onConsoleLog(callback) {
 }
 
 const plugins = [
-  _x1LDWXaDKg,
-_5gU0qFpjn9
+  _9LxPwZF31Q,
+_RbTOEXUJrX
 ];
 
-const _lazy_kdwqQN = () => Promise.resolve().then(function () { return renderer$1; });
+const _lazy_QCBD5j = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
-  { route: '/__nuxt_error', handler: _lazy_kdwqQN, lazy: true, middleware: false, method: undefined },
-  { route: '/**', handler: _lazy_kdwqQN, lazy: true, middleware: false, method: undefined }
+  { route: '/__nuxt_error', handler: _lazy_QCBD5j, lazy: true, middleware: false, method: undefined },
+  { route: '/**', handler: _lazy_QCBD5j, lazy: true, middleware: false, method: undefined }
 ];
 
-const serverAssets = [{"baseName":"server","dir":"/home/project/server/assets"}];
+const serverAssets = [{"baseName":"server","dir":"D:/STAFAST/CODES/KGS/BENIN MIRROR/server/assets"}];
 
 const assets = createStorage();
 
@@ -290,11 +290,11 @@ const storage = createStorage({});
 
 storage.mount('/assets', assets);
 
-storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/home/project","ignore":["**/node_modules/**","**/.git/**"]}));
-storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/home/project/server","ignore":["**/node_modules/**","**/.git/**"]}));
-storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/home/project/.nuxt","ignore":["**/node_modules/**","**/.git/**"]}));
-storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/home/project/.nuxt/cache","ignore":["**/node_modules/**","**/.git/**"]}));
-storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"/home/project/.data/kv","ignore":["**/node_modules/**","**/.git/**"]}));
+storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:\\STAFAST\\CODES\\KGS\\BENIN MIRROR","ignore":["**/node_modules/**","**/.git/**"]}));
+storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"D:\\STAFAST\\CODES\\KGS\\BENIN MIRROR\\server","ignore":["**/node_modules/**","**/.git/**"]}));
+storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:\\STAFAST\\CODES\\KGS\\BENIN MIRROR\\.nuxt","ignore":["**/node_modules/**","**/.git/**"]}));
+storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"D:\\STAFAST\\CODES\\KGS\\BENIN MIRROR\\.nuxt\\cache","ignore":["**/node_modules/**","**/.git/**"]}));
+storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"D:\\STAFAST\\CODES\\KGS\\BENIN MIRROR\\.data\\kv","ignore":["**/node_modules/**","**/.git/**"]}));
 
 function useStorage(base = "") {
   return base ? prefixStorage(storage, base) : storage;
@@ -778,11 +778,6 @@ new Proxy(/* @__PURE__ */ Object.create(null), {
   }
 });
 
-getContext("nitro-app", {
-  asyncContext: false,
-  AsyncLocalStorage: undefined
-});
-
 const config = useRuntimeConfig();
 const _routeRulesMatcher = toRouteMatcher(
   createRouter({ routes: config.nitro.routeRules })
@@ -1193,8 +1188,8 @@ function publicAssetsURL(...path) {
 
 globalThis.__buildAssetsURL = buildAssetsURL;
 globalThis.__publicAssetsURL = publicAssetsURL;
-const getClientManifest = () => import('file:///home/project/.nuxt/dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
-const getServerEntry = () => import('file:///home/project/.nuxt/dist/server/server.mjs').then((r) => r.default || r);
+const getClientManifest = () => import('file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/.nuxt/dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
+const getServerEntry = () => import('file://D:/STAFAST/CODES/KGS/BENIN%20MIRROR/.nuxt/dist/server/server.mjs').then((r) => r.default || r);
 const getSSRStyles = lazyCachedFunction(() => Promise.resolve().then(function () { return styles$1; }).then((r) => r.default || r));
 const getSSRRenderer = lazyCachedFunction(async () => {
   const manifest = await getClientManifest();

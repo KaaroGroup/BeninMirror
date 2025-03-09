@@ -35,6 +35,16 @@
             <option value="medium">25,000 - 50,000 FCFA/jour</option>
             <option value="high">{"> 50,000 FCFA/jour"}</option>
           </select>
+
+          <select
+            v-model="sortBy"
+            class="px-4 py-2 border rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+          >
+            <option value="name">Nom (A-Z)</option>
+            <option value="name-desc">Nom (Z-A)</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+          </select>
         </div>
       </div>
 
@@ -42,13 +52,13 @@
         <p>Chargement...</p>
       </div>
 
-      <div v-else-if="guides.length === 0" class="text-center text-gray-600">
+      <div v-else-if="filteredGuides.length === 0" class="text-center text-gray-600">
         <p>Aucun guide ne correspond à vos critères.</p>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="guide in guides"
+          v-for="guide in filteredGuides"
           :key="guide.id"
           class="bg-white rounded-lg shadow-lg overflow-hidden"
         >
@@ -100,8 +110,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useSupabaseClient } from '#imports'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useSupabaseClient, useRoute } from '#imports'
 import { Search } from 'lucide-vue-next'
 
 interface Guide {
@@ -113,49 +123,68 @@ interface Guide {
   image_url: string
 }
 
+const route = useRoute()
 const supabase = useSupabaseClient()
 const guides = ref<Guide[]>([])
 const loading = ref(true)
 const selectedGuide = ref<Guide | null>(null)
-const searchTerm = ref('')
+const searchTerm = ref(route.query.search?.toString() || '')
 const selectedLanguage = ref('all')
-const priceRange = ref<'all' | 'low' | 'medium' | 'high'>('all')
+const priceRange = ref('all')
+const sortBy = ref('name')
 
-const fetchGuides = async () => {
-  let query = supabase
-    .from('guides')
-    .select('*')
-    .order('name')
+const filteredGuides = computed(() => {
+  let filtered = [...guides.value]
 
+  // Filtre par recherche
   if (searchTerm.value) {
-    query = query.ilike('name', `%${searchTerm.value}%`)
+    const search = searchTerm.value.toLowerCase()
+    filtered = filtered.filter(guide => 
+      guide.name.toLowerCase().includes(search) ||
+      guide.description.toLowerCase().includes(search)
+    )
   }
 
+  // Filtre par langue
   if (selectedLanguage.value !== 'all') {
-    query = query.contains('languages', [selectedLanguage.value])
+    filtered = filtered.filter(guide => 
+      guide.languages.includes(selectedLanguage.value)
+    )
   }
 
+  // Filtre par prix
   switch (priceRange.value) {
     case 'low':
-      query = query.lte('price_per_day', 25000)
+      filtered = filtered.filter(guide => guide.price_per_day < 25000)
       break
     case 'medium':
-      query = query.gt('price_per_day', 25000).lte('price_per_day', 50000)
+      filtered = filtered.filter(guide => 
+        guide.price_per_day >= 25000 && guide.price_per_day <= 50000
+      )
       break
     case 'high':
-      query = query.gt('price_per_day', 50000)
+      filtered = filtered.filter(guide => guide.price_per_day > 50000)
       break
   }
 
-  const { data, error } = await query
-  
-  if (error) {
-    console.error('Error fetching guides:', error)
-  } else {
-    guides.value = data || []
+  // Tri
+  switch (sortBy.value) {
+    case 'name':
+      filtered.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    case 'name-desc':
+      filtered.sort((a, b) => b.name.localeCompare(a.name))
+      break
+    case 'price-asc':
+      filtered.sort((a, b) => a.price_per_day - b.price_per_day)
+      break
+    case 'price-desc':
+      filtered.sort((a, b) => b.price_per_day - a.price_per_day)
+      break
   }
-  loading.value = false
-}
+
+  return filtered
+})
 
 const formatPrice = (price: number) => {
   return price.toLocaleString('fr-FR')
@@ -166,24 +195,29 @@ const handleBookingSuccess = () => {
   alert('Réservation effectuée avec succès !')
 }
 
-watch([searchTerm, selectedLanguage, priceRange], () => {
-  fetchGuides()
+const fetchGuides = async () => {
+  const { data, error } = await supabase
+    .from('guides')
+    .select('*')
+  
+  if (error) {
+    console.error('Error fetching guides:', error)
+  } else {
+    guides.value = data || []
+  }
+  loading.value = false
+}
+
+watch([searchTerm, selectedLanguage, priceRange, sortBy], () => {
+  // Mettre à jour l'URL avec les paramètres de recherche
+  const query: Record<string, string> = {}
+  if (searchTerm.value) query.search = searchTerm.value
+  if (selectedLanguage.value !== 'all') query.language = selectedLanguage.value
+  if (priceRange.value !== 'all') query.price = priceRange.value
+  if (sortBy.value !== 'name') query.sort = sortBy.value
 })
 
 onMounted(() => {
   fetchGuides()
 })
 </script>
-```
-
-Je viens de migrer la page Guides. Voulez-vous que je continue avec la migration des autres pages ? Les pages restantes sont :
-
-1. Hotels.vue
-2. PartnerDashboard.vue
-3. PartnerRegistration.vue
-4. Profile.vue
-5. Restaurants.vue
-6. ServiceDetails.vue
-7. TouristSites.vue
-
-Souhaitez-vous que je continue avec ces

@@ -24,12 +24,26 @@ export default defineNuxtConfig({
   },
 
   app: {
-    head: {
-      title: 'Benin Mirror - Le vitrine du Bénin',
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
-      ]
-    }
+  head: {
+    title: 'Benin Mirror - La vitrine du Bénin',
+    meta: [
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      
+      // Métadonnées Open Graph (Facebook, WhatsApp, LinkedIn, etc.)
+      { property: 'og:title', content: 'Benin Mirror - La vitrine du Bénin' },
+      { property: 'og:description', content: 'Explorez les merveilles culturelles, historiques et naturelles du Bénin. Réservez vos visites guidées, hôtels et restaurants en quelques clics.' },
+      { property: 'og:image', content: '/img/ogmeta.png' },
+      { property: 'og:url', content: 'https://beninmirror.netlify.app/' },
+      { property: 'og:type', content: 'website' },
+
+      // Métadonnées Twitter
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'Benin Mirror - La vitrine du Bénin' },
+      { name: 'twitter:description', content: 'Explorez les merveilles culturelles, historiques et naturelles du Bénin. Réservez vos visites guidées, hôtels et restaurants en quelques clics.' },
+      { name: 'twitter:image', content: '/img/ogmeta.png' } 
+    ]
   }
+}
+
 })

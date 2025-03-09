@@ -5,17 +5,17 @@
         <p>Chargement...</p>
       </div>
       
-      <div v-else-if="!partnerData" class="text-center py-12">
-        <p>Vous n'êtes pas encore inscrit en tant que partenaire.</p>
+      <div v-else-if="error" class="text-center py-12">
+        <p class="text-red-600">{{ error }}</p>
       </div>
       
-      <template v-else>
+      <template v-else-if="partnerData">
         <div class="mb-8">
           <h1 class="text-2xl font-bold text-gray-900">
             Tableau de bord - {{ partnerData.business_name }}
           </h1>
           <p class="mt-2 text-gray-600">
-            {{ partnerData.type.description }}
+            {{ partnerData.type?.description }}
           </p>
         </div>
 
@@ -134,12 +134,22 @@
         <!-- Formulaire d'ajout de service -->
         <PartnerServiceForm
           v-if="showServiceForm"
-          :partnerType="partnerData.type.name"
+          :partnerType="partnerData.type?.name"
           :partnerId="partnerData.id"
           :onSuccess="handleServiceFormSuccess"
           :onCancel="() => showServiceForm = false"
         />
       </template>
+
+      <div v-else class="text-center py-12">
+        <p>Vous n'êtes pas encore inscrit en tant que partenaire.</p>
+        <NuxtLink
+          to="/partner/register"
+          class="inline-block mt-4 bg-emerald-600 text-white px-6 py-2 rounded-md hover:bg-emerald-700"
+        >
+          Devenir partenaire
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>
@@ -153,7 +163,7 @@ import { Users, DollarSign, Calendar, BarChart, Plus, Trash2 } from 'lucide-vue-
 interface PartnerData {
   id: string
   business_name: string
-  type: {
+  type?: {
     name: string
     description: string
   }
@@ -185,6 +195,7 @@ const partnerData = ref<PartnerData | null>(null)
 const stats = ref<Stats | null>(null)
 const services = ref<Service[]>([])
 const loading = ref(true)
+const error = ref('')
 const showServiceForm = ref(false)
 
 const formatPrice = (price: number) => {
@@ -211,16 +222,16 @@ const getTableName = (partnerType: string) => {
 }
 
 const handleDeleteService = async (serviceId: string) => {
-  if (!partnerData.value) return
+  if (!partnerData.value?.type?.name) return
 
   const tableName = getTableName(partnerData.value.type.name)
-  const { error } = await supabase
+  const { error: deleteError } = await supabase
     .from(tableName)
     .delete()
     .eq('id', serviceId)
 
-  if (error) {
-    console.error('Error deleting service:', error)
+  if (deleteError) {
+    console.error('Error deleting service:', deleteError)
     alert('Une erreur est survenue lors de la suppression')
   } else {
     services.value = services.value.filter(s => s.id !== serviceId)
@@ -229,70 +240,68 @@ const handleDeleteService = async (serviceId: string) => {
 
 const handleServiceFormSuccess = () => {
   showServiceForm.value = false
-  // Recharger les services
-  window.location.reload()
+  fetchPartnerData()
 }
 
-onMounted(async () => {
-  if (!user.value) return
-
-  const { data: partnerData, error: partnerError } = await supabase
-    .from('partners')
-    .select(`
-      id,
-      business_name,
-      type:partner_types(name, description)
-    `)
-    .eq('user_id', user.value.id)
-    .single()
-
-  if (partnerError) {
-    console.error('Error fetching partner data:', partnerError)
+const fetchPartnerData = async () => {
+  if (!user.value) {
     loading.value = false
     return
   }
 
-  if (partnerData) {
-    // Assigner les données du partenaire
-    const partnerInfo: PartnerData = {
-      id: partnerData.id,
-      business_name: partnerData.business_name,
-      type: partnerData.type
-    }
-    
-    // Stocker les données du partenaire
-    partnerData.value = partnerInfo
+  try {
+    // Récupérer les données du partenaire avec le type
+    const { data: partner, error: partnerError } = await supabase
+      .from('partners')
+      .select(`
+        id,
+        business_name,
+        type:type_id (
+          name,
+          description
+        )
+      `)
+      .eq('user_id', user.value.id)
+      .maybeSingle()
 
-    // Récupérer les statistiques
-    const { data: statsData, error: statsError } = await supabase
-      .from('partner_stats')
-      .select('*')
-      .eq('partner_id', partnerData.id)
-      .single()
+    if (partnerError) throw partnerError
 
-    if (statsError) {
-      console.error('Error fetching stats:', statsError)
-    } else {
-      stats.value = statsData
-    }
+    if (partner) {
+      partnerData.value = partner
 
-    // Récupérer les services en fonction du type de partenaire
-    let tableName = getTableName(partnerData.type.name)
-
-    if (tableName) {
-      const { data: servicesData, error: servicesError } = await supabase
-        .from(tableName)
+      // Récupérer les statistiques
+      const { data: statsData } = await supabase
+        .from('partner_stats')
         .select('*')
-        .eq('partner_id', partnerData.id)
+        .eq('partner_id', partner.id)
+        .maybeSingle()
 
-      if (servicesError) {
-        console.error('Error fetching services:', servicesError)
-      } else {
-        services.value = servicesData || []
+      stats.value = statsData || { total_bookings: 0, total_revenue: 0, last_booking_date: null }
+
+      // Récupérer les services
+      if (partner.type?.name) {
+        const tableName = getTableName(partner.type.name)
+        if (tableName) {
+          const { data: servicesData } = await supabase
+            .from(tableName)
+            .select('*')
+            .eq('partner_id', partner.id)
+
+          services.value = servicesData || []
+        }
       }
+    } else {
+      partnerData.value = null
     }
+  } catch (err) {
+    console.error('Error fetching partner data:', err)
+    error.value = 'Une erreur est survenue lors du chargement des données'
+  } finally {
+    loading.value = false
   }
+}
 
-  loading.value = false
+onMounted(() => {
+  fetchPartnerData()
 })
 </script>

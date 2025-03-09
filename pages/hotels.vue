@@ -24,6 +24,16 @@
             <option value="medium">50,000 - 100,000 FCFA</option>
             <option value="high">{"> 100,000 FCFA"}</option>
           </select>
+
+          <select
+            v-model="sortBy"
+            class="px-4 py-2 border rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+          >
+            <option value="name">Nom (A-Z)</option>
+            <option value="name-desc">Nom (Z-A)</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+          </select>
         </div>
       </div>
 
@@ -77,9 +87,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Search } from 'lucide-vue-next'
-import { useSupabaseClient } from '#imports'
+import { useSupabaseClient, useRoute } from '#imports'
 
 interface Hotel {
   id: string
@@ -90,33 +100,56 @@ interface Hotel {
   image_url: string
 }
 
+const route = useRoute()
 const supabase = useSupabaseClient()
 const hotels = ref<Hotel[]>([])
 const loading = ref(true)
 const selectedHotel = ref<Hotel | null>(null)
-const searchTerm = ref('')
+const searchTerm = ref(route.query.search?.toString() || '')
 const priceRange = ref('all')
+const sortBy = ref('name')
 
 const filteredHotels = computed(() => {
-  let filtered = hotels.value
+  let filtered = [...hotels.value]
 
+  // Filtre par recherche
   if (searchTerm.value) {
+    const search = searchTerm.value.toLowerCase()
     filtered = filtered.filter(hotel => 
-      hotel.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+      hotel.name.toLowerCase().includes(search) ||
+      hotel.description.toLowerCase().includes(search) ||
+      hotel.location.toLowerCase().includes(search)
     )
   }
 
+  // Filtre par prix
   switch (priceRange.value) {
     case 'low':
-      filtered = filtered.filter(hotel => hotel.price_per_night <= 50000)
+      filtered = filtered.filter(hotel => hotel.price_per_night < 50000)
       break
     case 'medium':
       filtered = filtered.filter(hotel => 
-        hotel.price_per_night > 50000 && hotel.price_per_night <= 100000
+        hotel.price_per_night >= 50000 && hotel.price_per_night <= 100000
       )
       break
     case 'high':
       filtered = filtered.filter(hotel => hotel.price_per_night > 100000)
+      break
+  }
+
+  // Tri
+  switch (sortBy.value) {
+    case 'name':
+      filtered.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    case 'name-desc':
+      filtered.sort((a, b) => b.name.localeCompare(a.name))
+      break
+    case 'price-asc':
+      filtered.sort((a, b) => a.price_per_night - b.price_per_night)
+      break
+    case 'price-desc':
+      filtered.sort((a, b) => b.price_per_night - a.price_per_night)
       break
   }
 
@@ -136,8 +169,7 @@ const fetchHotels = async () => {
   const { data, error } = await supabase
     .from('hotels')
     .select('*')
-    .order('name')
-
+  
   if (error) {
     console.error('Error fetching hotels:', error)
   } else {
@@ -145,6 +177,14 @@ const fetchHotels = async () => {
   }
   loading.value = false
 }
+
+watch([searchTerm, priceRange, sortBy], () => {
+  // Mettre à jour l'URL avec les paramètres de recherche
+  const query: Record<string, string> = {}
+  if (searchTerm.value) query.search = searchTerm.value
+  if (priceRange.value !== 'all') query.price = priceRange.value
+  if (sortBy.value !== 'name') query.sort = sortBy.value
+})
 
 onMounted(() => {
   fetchHotels()

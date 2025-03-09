@@ -18,9 +18,6 @@
 
         <!-- Menu desktop -->
         <div class="hidden md:flex items-center space-x-8">
-          <NuxtLink to="/" class="text-gray-700 hover:text-emerald-600">
-            Accueil
-          </NuxtLink>
           <NuxtLink to="/sites-touristiques" class="text-gray-700 hover:text-emerald-600">
             Sites Touristiques
           </NuxtLink>
@@ -106,7 +103,6 @@ const { user } = useAuth()
 const isMenuOpen = ref(false)
 
 const mobileLinks = [
-  { to: '/', text: 'Accueil' },
   { to: '/sites-touristiques', text: 'Sites Touristiques' },
   { to: '/hotels', text: 'Hôtels' },
   { to: '/restaurants', text: 'Restaurants' },

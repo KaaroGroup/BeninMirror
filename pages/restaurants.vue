@@ -34,6 +34,14 @@
             <option value="€€">€€ - Intermédiaire</option>
             <option value="€€€">€€€ - Haut de gamme</option>
           </select>
+
+          <select
+            v-model="sortBy"
+            class="px-4 py-2 border rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+          >
+            <option value="name">Nom (A-Z)</option>
+            <option value="name-desc">Nom (Z-A)</option>
+          </select>
         </div>
       </div>
 
@@ -41,7 +49,7 @@
         <p>Chargement...</p>
       </div>
 
-      <p v-else-if="restaurants.length === 0" class="text-center text-gray-600">
+      <p v-else-if="filteredRestaurants.length === 0" class="text-center text-gray-600">
         Aucun restaurant ne correspond à vos critères.
       </p>
 
@@ -90,9 +98,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Search } from 'lucide-vue-next'
-import { useSupabaseClient } from '#imports'
+import { useSupabaseClient, useRoute } from '#imports'
 
 interface Restaurant {
   id: string
@@ -104,33 +112,51 @@ interface Restaurant {
   image_url: string
 }
 
+const route = useRoute()
 const supabase = useSupabaseClient()
 const restaurants = ref<Restaurant[]>([])
 const loading = ref(true)
 const selectedRestaurant = ref<Restaurant | null>(null)
-const searchTerm = ref('')
+const searchTerm = ref(route.query.search?.toString() || '')
 const selectedCuisine = ref('all')
 const selectedPriceRange = ref('all')
+const sortBy = ref('name')
 
 const filteredRestaurants = computed(() => {
-  let filtered = restaurants.value
+  let filtered = [...restaurants.value]
 
+  // Filtre par recherche
   if (searchTerm.value) {
+    const search = searchTerm.value.toLowerCase()
     filtered = filtered.filter(restaurant => 
-      restaurant.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+      restaurant.name.toLowerCase().includes(search) ||
+      restaurant.description.toLowerCase().includes(search) ||
+      restaurant.location.toLowerCase().includes(search)
     )
   }
 
+  // Filtre par cuisine
   if (selectedCuisine.value !== 'all') {
     filtered = filtered.filter(restaurant => 
       restaurant.cuisine_type === selectedCuisine.value
     )
   }
 
+  // Filtre par gamme de prix
   if (selectedPriceRange.value !== 'all') {
     filtered = filtered.filter(restaurant => 
       restaurant.price_range === selectedPriceRange.value
     )
+  }
+
+  // Tri par nom
+  switch (sortBy.value) {
+    case 'name':
+      filtered.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    case 'name-desc':
+      filtered.sort((a, b) => b.name.localeCompare(a.name))
+      break
   }
 
   return filtered
@@ -145,7 +171,6 @@ const fetchRestaurants = async () => {
   const { data, error } = await supabase
     .from('restaurants')
     .select('*')
-    .order('name')
 
   if (error) {
     console.error('Error fetching restaurants:', error)
@@ -154,6 +179,15 @@ const fetchRestaurants = async () => {
   }
   loading.value = false
 }
+
+watch([searchTerm, selectedCuisine, selectedPriceRange, sortBy], () => {
+  // Mettre à jour l'URL avec les paramètres de recherche
+  const query: Record<string, string> = {}
+  if (searchTerm.value) query.search = searchTerm.value
+  if (selectedCuisine.value !== 'all') query.cuisine = selectedCuisine.value
+  if (selectedPriceRange.value !== 'all') query.price = selectedPriceRange.value
+  if (sortBy.value !== 'name') query.sort = sortBy.value
+})
 
 onMounted(() => {
   fetchRestaurants()
