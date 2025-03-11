@@ -60,6 +60,8 @@
             <input
               type="number"
               v-model="formData.price"
+              min="0"
+              step="100"
               class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
               required
             />
@@ -116,6 +118,9 @@
               <span class="ml-2">{{ lang }}</span>
             </label>
           </div>
+          <p v-if="formData.languages.length === 0" class="mt-1 text-sm text-red-600">
+            Sélectionnez au moins une langue
+          </p>
         </div>
 
         <div>
@@ -129,6 +134,7 @@
             <input
               type="url"
               v-model="formData.imageUrl"
+              placeholder="https://example.com/image.jpg"
               class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
               required
             />
@@ -147,7 +153,7 @@
           <button
             type="submit"
             class="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 disabled:opacity-50"
-            :disabled="loading"
+            :disabled="loading || (partnerType === 'transport' && formData.languages.length === 0)"
           >
             {{ loading ? 'Ajout en cours...' : 'Ajouter le service' }}
           </button>
@@ -206,6 +212,47 @@ const toggleLanguage = (lang: string) => {
   }
 }
 
+const validateForm = () => {
+  if (!formData.name.trim()) {
+    error.value = 'Le nom est requis'
+    return false
+  }
+  if (!formData.description.trim()) {
+    error.value = 'La description est requise'
+    return false
+  }
+  if (props.partnerType !== 'transport' && !formData.location.trim()) {
+    error.value = 'La localisation est requise'
+    return false
+  }
+  if (props.partnerType === 'transport' && formData.languages.length === 0) {
+    error.value = 'Sélectionnez au moins une langue'
+    return false
+  }
+  if (!formData.imageUrl.trim()) {
+    error.value = 'L\'URL de l\'image est requise'
+    return false
+  }
+  if (!formData.imageUrl.match(/^https?:\/\/.+\/.+$/)) {
+    error.value = 'L\'URL de l\'image doit être une URL valide (commençant par http:// ou https://)'
+    return false
+  }
+  if (props.partnerType === 'restaurant') {
+    if (!formData.cuisineType) {
+      error.value = 'Le type de cuisine est requis'
+      return false
+    }
+    if (!formData.priceRange) {
+      error.value = 'La gamme de prix est requise'
+      return false
+    }
+  } else if (!formData.price || parseFloat(formData.price) <= 0) {
+    error.value = 'Le prix doit être supérieur à 0'
+    return false
+  }
+  return true
+}
+
 const getTableName = (partnerType: string) => {
   switch (partnerType) {
     case 'cultural_site':
@@ -217,7 +264,7 @@ const getTableName = (partnerType: string) => {
     case 'transport':
       return 'guides'
     default:
-      return null
+      throw new Error('Type de partenaire non valide')
   }
 }
 
@@ -226,22 +273,24 @@ const handleSubmit = async () => {
   error.value = ''
 
   try {
-    const tableName = getTableName(props.partnerType)
-    if (!tableName) {
-      throw new Error('Type de partenaire invalide')
+    if (!validateForm()) {
+      loading.value = false
+      return
     }
 
-    let data = {
-      name: formData.name,
-      description: formData.description,
-      image_url: formData.imageUrl,
+    const tableName = getTableName(props.partnerType)
+
+    let data: Record<string, any> = {
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      image_url: formData.imageUrl.trim(),
       partner_id: props.partnerId
     }
 
     // Ajouter les champs spécifiques selon le type
     if (props.partnerType === 'restaurant') {
       Object.assign(data, {
-        location: formData.location,
+        location: formData.location.trim(),
         cuisine_type: formData.cuisineType,
         price_range: formData.priceRange
       })
@@ -252,23 +301,40 @@ const handleSubmit = async () => {
       })
     } else {
       Object.assign(data, {
-        location: formData.location,
-        price: props.partnerType === 'accommodation' 
-          ? { price_per_night: parseFloat(formData.price) }
-          : { price: parseFloat(formData.price) }
+        location: formData.location.trim(),
+        price: parseFloat(formData.price)
       })
+      
+      // Ajuster le nom du champ de prix pour les hôtels
+      if (props.partnerType === 'accommodation') {
+        data.price_per_night = data.price
+        delete data.price
+      }
     }
 
     const { error: insertError } = await supabase
       .from(tableName)
       .insert([data])
 
-    if (insertError) throw insertError
+    if (insertError) {
+      console.error('Error details:', insertError)
+      
+      if (insertError.code === '23505') { // Code pour violation de contrainte unique
+        error.value = 'Un service avec ce nom existe déjà'
+      } else if (insertError.code === '23503') { // Code pour violation de clé étrangère
+        error.value = 'Erreur de référence : le partenaire n\'existe pas'
+      } else if (insertError.code === '23502') { // Code pour violation de contrainte NOT NULL
+        error.value = 'Tous les champs requis doivent être remplis'
+      } else {
+        error.value = `Erreur lors de l'ajout du service : ${insertError.message}`
+      }
+      return
+    }
 
     props.onSuccess()
   } catch (err) {
     console.error('Error adding service:', err)
-    error.value = 'Une erreur est survenue lors de l\'ajout du service. Veuillez réessayer.'
+    error.value = err instanceof Error ? err.message : 'Une erreur inattendue est survenue'
   } finally {
     loading.value = false
   }

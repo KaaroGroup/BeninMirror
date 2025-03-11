@@ -47,7 +47,7 @@ const faqs = [
     answer: 'Nous acceptons les paiements par mobile money. Pour votre sécurité, tous les paiements sont traités via des plateformes sécurisées.'
   },
   {
-    question: 'Comment puis-je réserver un guide touristique ?',
+    question: 'Comment puis-je réserver un guide de tourisme ?',
     answer: 'Vous pouvez réserver un guide directement sur notre site dans la section "Guides". Choisissez votre guide en fonction de ses spécialités et des langues parlées, puis sélectionnez vos dates.'
   },
   {

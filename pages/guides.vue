@@ -2,7 +2,7 @@
   <div class="min-h-screen pt-16 px-4">
     <div class="max-w-7xl mx-auto py-12">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4 md:mb-0">Guides Touristiques</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4 md:mb-0">Guides de tourisme</h1>
         
         <div class="w-full md:w-auto flex flex-col md:flex-row gap-4">
           <div class="relative">
